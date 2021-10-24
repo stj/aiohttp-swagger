@@ -107,7 +107,7 @@ def generate_doc_from_each_end_point(
     jinja2_env.filters['nesteddict2yaml'] = nesteddict2yaml
 
     if template_path is None:
-        if ui_version == 3:
+        if ui_version in (3, 4):
             template_path = join(SWAGGER_TEMPLATE, "openapi.yaml")
         else:
             template_path = join(SWAGGER_TEMPLATE, "swagger.yaml")

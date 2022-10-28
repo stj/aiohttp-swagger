@@ -55,7 +55,7 @@ class PyTest(TestCommand):
 
 setup(
     name='aiohttp-swagger',
-    version='1.0.15',
+    version='1.0.16',
     install_requires=required,
     url='https://github.com/cr0hn/aiohttp-swagger',
     license='BSD',
@@ -68,6 +68,7 @@ setup(
     },
     description='Swagger API Documentation builder for aiohttp server',
     long_description=long_description,
+    long_description_content_type="text/markdown",
     classifiers=[
         'Environment :: Console',
         'Intended Audience :: System Administrators',

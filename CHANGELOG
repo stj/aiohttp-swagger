@@ -1,4 +1,12 @@
+Version 1.1.1
+=============
+- Drops Python 3.5, 3.6, 3.7
+- Adds support for Python 3.9, 3.10, 3.11
+- Updates versions of dependencies
+- Updates swagger ui version to 5.12.0
+
 Version 1.0.15
+==============
 - Fixes a bug in setup.py where the distribution exports the package tests along with the actual library.
 - Latest js-yaml fixes security issue related to https://www.npmjs.com/advisories/813
 - Added logic that checks whether the route.method is * or contains a single method. When the latter is the case only the method that is specified will be added to the Swagger UI.

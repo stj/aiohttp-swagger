@@ -53,10 +53,9 @@ def setup_swagger(app: web.Application,
     _base_swagger_url = _swagger_url.rstrip('/')
     _swagger_def_url = '{}/swagger.json'.format(_base_swagger_url)
 
+    STATIC_PATH = abspath(join(dirname(__file__), "swagger_ui"))
     if ui_version == 3:
-        STATIC_PATH = abspath(join(dirname(__file__), "swagger_ui3"))
-    else:
-        STATIC_PATH = abspath(join(dirname(__file__), "swagger_ui"))
+        STATIC_PATH += "3"
 
     # Build Swagget Info
     if swagger_info is None:

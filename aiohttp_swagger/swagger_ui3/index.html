@@ -5,7 +5,6 @@
     <meta charset="UTF-8">
     <title>Swagger UI</title>
     <link rel="stylesheet" type="text/css" href="##STATIC_PATH##/swagger-ui.css" />
-    <link rel="stylesheet" type="text/css" href="##STATIC_PATH##/index.css" />
     <link rel="icon" type="image/png" href="##STATIC_PATH##/favicon-32x32.png" sizes="32x32" />
     <link rel="icon" type="image/png" href="##STATIC_PATH##/favicon-16x16.png" sizes="16x16" />
   </head>
@@ -14,22 +13,23 @@
     <div id="swagger-ui"></div>
     <script src="##STATIC_PATH##/swagger-ui-bundle.js" charset="UTF-8"> </script>
     <script src="##STATIC_PATH##/swagger-ui-standalone-preset.js" charset="UTF-8"> </script>
-    <script charset="UTF-8">
-  window.onload = function() {
-  window.ui = SwaggerUIBundle({
-    url: "##SWAGGER_CONFIG##",
-    dom_id: '#swagger-ui',
-    deepLinking: true,
-    presets: [
-      SwaggerUIBundle.presets.apis,
-      SwaggerUIStandalonePreset
-    ],
-    plugins: [
-      SwaggerUIBundle.plugins.DownloadUrl
-    ],
-    layout: "StandaloneLayout"
-  });
-};
+    <script>
+    window.onload = function() {
+      // Begin Swagger UI call region
+      window.ui = SwaggerUIBundle({
+        url: "##SWAGGER_CONFIG##",
+        dom_id: '#swagger-ui',
+        deepLinking: true,
+        presets: [
+          SwaggerUIBundle.presets.apis,
+          SwaggerUIStandalonePreset
+        ],
+        plugins: [
+          SwaggerUIBundle.plugins.DownloadUrl
+        ],
+        layout: "StandaloneLayout"
+      });
+    };
     </script>
   </body>
 </html>

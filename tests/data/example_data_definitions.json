@@ -37,6 +37,11 @@
         "type": "string",
         "description": "User's permission parameter",
         "default": "some_perm"
+      },
+      "permission_param_3": {
+        "type": "object",
+        "description": "User's permission parameter",
+        "default": {}
       }
     },
     "required": [

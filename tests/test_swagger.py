@@ -356,6 +356,7 @@ async def test_data_defs(aiohttp_client, loop):
     assert 'User' in result['definitions']
     assert 'Permission' in result['definitions']
     assert result['definitions']['User']['properties']['permissions']['items']['$ref'] is not None
+    assert result['definitions']['Permission']['properties']['permission_param_3']['default'] is not None
 
 
 async def test_sub_app(aiohttp_client, loop):

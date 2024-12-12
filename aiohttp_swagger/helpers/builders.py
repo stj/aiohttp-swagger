@@ -94,7 +94,7 @@ def generate_doc_from_each_end_point(
     def nesteddict2yaml(d, indent=10, result=""):
         for key, value in d.items():
             result += " " * indent + str(key) + ':'
-            if isinstance(value, dict):
+            if isinstance(value, dict) and value:
                 result = nesteddict2yaml(value, indent + 2, result + "\n")
             elif isinstance(value, str):
                 result += " \"" + str(value) + "\"\n"

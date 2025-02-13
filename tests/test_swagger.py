@@ -362,6 +362,21 @@ async def test_data_defs(aiohttp_client):
     assert result['definitions']['Permission']['properties']['permission_param_3']['default'] is not None
 
 
+async def test_parameter_defs(aiohttp_client):
+    TESTS_PATH = abspath(join(dirname(__file__)))
+    with open(TESTS_PATH + "/data/example_data_parameters.json") as file:
+        app = web.Application()
+        app.router.add_route('GET', "/users", users_with_data_def)
+        setup_swagger(app, ui_version=3, parameters=json.loads(file.read()))
+
+    client = await aiohttp_client(app)
+    swagger_resp1 = await client.get('/api/doc/swagger.json')
+    assert swagger_resp1.status == 200
+    result = await swagger_resp1.json()
+    assert 'XAppNameHeader' in result['components']['parameters']
+    assert result['components']['parameters']['XAppNameHeader']['schema']['default'] is not None
+
+
 async def test_sub_app(aiohttp_client):
     sub_app = web.Application()
     sub_app.router.add_route('*', "/class_view", ClassView)

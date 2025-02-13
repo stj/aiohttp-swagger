@@ -10,6 +10,10 @@ info:
 servers:
   - url: {{ base_path }}
 components:
+  {% if parameters %}
+  parameters:
+{{ parameters|nesteddict2yaml }}
+  {% endif %}
   {% if definitions %}
   schemas:
 {{ definitions|nesteddict2yaml }}

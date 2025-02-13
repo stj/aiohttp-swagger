@@ -1,0 +1,11 @@
+{
+  "XAppNameHeader": {
+    "name": "X-App-Name",
+    "in": "header",
+    "required": true,
+    "schema": {
+      "type": "string",
+      "default": "aiohttp"
+    }
+  }
+}

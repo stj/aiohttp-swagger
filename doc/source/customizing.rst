@@ -217,7 +217,7 @@ Following example shows how to define nested object and reuse it when writing sw
         - application/json
         responses:
             "200":
-                description: Successful operation, returns User object nested permisiion list
+                description: Successful operation, returns User object nested permission list
                 schema:
                   $ref: '#/definitions/User'
         """

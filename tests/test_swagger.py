@@ -38,7 +38,7 @@ async def users_with_data_def(request):
     - application/json
     responses:
         "200":
-            description: Successful operation, returns User object nested permisiion list
+            description: Successful operation, returns User object nested permission list
             schema:
               $ref: '#/definitions/User'
     """

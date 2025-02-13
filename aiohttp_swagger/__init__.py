@@ -51,6 +51,8 @@ def setup_swagger(
     definitions: dict = None,
     security_definitions: dict = None,
     parameters: dict = None,
+    skip_head_routes: bool = False,
+    skip_options_routes: bool = False,
 ):
     _swagger_url = (
         "/{}".format(swagger_url) if not swagger_url.startswith("/") else swagger_url
@@ -79,6 +81,8 @@ def setup_swagger(
                 definitions=definitions,
                 security_definitions=security_definitions,
                 parameters=parameters,
+                skip_head_routes=skip_head_routes,
+                skip_options_routes=skip_options_routes,
             )
     else:
         swagger_info = json.dumps(swagger_info)

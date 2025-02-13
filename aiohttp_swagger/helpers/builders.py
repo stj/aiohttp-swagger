@@ -39,11 +39,14 @@ def _extract_swagger_docs(end_point_doc, method="get"):
     return {method: end_point_swagger_doc}
 
 
-def _build_doc_from_func_doc(route):
+def _build_doc_from_func_doc(route, ignore_methods=None):
+    ignore_methods = ignore_methods or set()
 
     out = {}
     if isclass(route.handler) and issubclass(route.handler, web.View):
         for method_name in _get_method_names_for_handler(route):
+            if method_name.upper() in ignore_methods:
+                continue
             method = getattr(route.handler, method_name)
             if method.__doc__ is not None and "---" in method.__doc__:
                 end_point_doc = method.__doc__.splitlines()
@@ -86,6 +89,8 @@ def generate_doc_from_each_end_point(
     definitions: dict = None,
     security_definitions: dict = None,
     parameters: dict = None,
+    skip_head_routes: bool = False,
+    skip_options_routes: bool = False,
 ):
     # Clean description
     _start_desc = 0
@@ -132,7 +137,16 @@ def generate_doc_from_each_end_point(
     swagger = yaml.full_load(swagger_base)
     swagger["paths"] = defaultdict(dict)
 
+    ignore_methods = set()
+    if skip_head_routes:
+        ignore_methods.add(aiohttp.hdrs.METH_HEAD)
+    if skip_options_routes:
+        ignore_methods.add(aiohttp.hdrs.METH_OPTIONS)
+
     for route in app.router.routes():
+        if route.method.upper() in ignore_methods:
+            continue
+
         end_point_doc = None
 
         # If route has a external link to doc, we use it, not function doc
@@ -159,7 +173,7 @@ def generate_doc_from_each_end_point(
 
         # Check if end-point has Swagger doc
         else:
-            end_point_doc = _build_doc_from_func_doc(route)
+            end_point_doc = _build_doc_from_func_doc(route, ignore_methods)
 
         # there is doc available?
         if end_point_doc:

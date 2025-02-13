@@ -6,6 +6,7 @@ Version 1.2.0
 - Updates swagger ui version to 5.18.3
 - Updates versions of dependencies
 - Added support of global parameters
+- Allow skip of all HEAD and OPTIONS routes
 
 Version 1.1.1
 =============

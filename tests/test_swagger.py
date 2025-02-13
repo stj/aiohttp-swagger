@@ -7,6 +7,9 @@ from aiohttp import web
 from aiohttp_swagger import *
 
 
+pytestmark = pytest.mark.asyncio
+
+
 async def ping(request):
     """
     ---
@@ -93,8 +96,8 @@ async def ping_partial(request):
     return web.Response(text="pong")
 
 
-async def test_ping(aiohttp_client, loop):
-    app = web.Application(loop=loop)
+async def test_ping(aiohttp_client):
+    app = web.Application()
     app.router.add_route('GET', "/ping", ping)
     client = await aiohttp_client(app)
     resp = await client.get('/ping')
@@ -103,11 +106,11 @@ async def test_ping(aiohttp_client, loop):
     assert 'pong' in text
 
 
-async def test_swagger_ui(aiohttp_client, loop):
+async def test_swagger_ui(aiohttp_client):
 
     TESTS_PATH = abspath(join(dirname(__file__)))
 
-    app = web.Application(loop=loop)
+    app = web.Application()
     setup_swagger(app,
                   swagger_from_file=TESTS_PATH + "/data/example_swagger.yaml")
 
@@ -122,10 +125,10 @@ async def test_swagger_ui(aiohttp_client, loop):
     assert retrieved == loaded
 
 
-async def test_swagger_ui3(aiohttp_client, loop):
+async def test_swagger_ui3(aiohttp_client):
     TESTS_PATH = abspath(join(dirname(__file__)))
 
-    app = web.Application(loop=loop)
+    app = web.Application()
     setup_swagger(app,
                   swagger_from_file=TESTS_PATH + "/data/example_swagger.yaml",
                   ui_version=3
@@ -142,10 +145,10 @@ async def test_swagger_ui3(aiohttp_client, loop):
     assert retrieved == loaded
 
 
-async def test_swagger_file_url(aiohttp_client, loop):
+async def test_swagger_file_url(aiohttp_client):
     TESTS_PATH = abspath(join(dirname(__file__)))
 
-    app = web.Application(loop=loop)
+    app = web.Application()
     setup_swagger(app,
                   swagger_from_file=TESTS_PATH + "/data/example_swagger.yaml")
 
@@ -158,8 +161,8 @@ async def test_swagger_file_url(aiohttp_client, loop):
     assert 'API Title' in result['info']['title']
 
 
-async def test_partial_swagger_file(aiohttp_client, loop):
-    app = web.Application(loop=loop)
+async def test_partial_swagger_file(aiohttp_client):
+    app = web.Application()
     app.router.add_route('GET', "/ping-partial", ping_partial)
     setup_swagger(app)
 
@@ -170,8 +173,8 @@ async def test_partial_swagger_file(aiohttp_client, loop):
     assert '/ping-partial' in result['paths']
 
 
-async def test_custom_swagger(aiohttp_client, loop):
-    app = web.Application(loop=loop)
+async def test_custom_swagger(aiohttp_client):
+    app = web.Application()
     app.router.add_route('GET', "/ping", ping)
     description = "Test Custom Swagger"
     setup_swagger(app,
@@ -189,8 +192,8 @@ async def test_custom_swagger(aiohttp_client, loop):
     assert 'Test Custom Title' in result['info']['title']
 
 
-async def test_swagger_home_decorator(aiohttp_client, loop):
-    app = web.Application(loop=loop)
+async def test_swagger_home_decorator(aiohttp_client):
+    app = web.Application()
     app.router.add_route('GET', "/ping", ping)
     description = "Test Custom Swagger"
     setup_swagger(app,
@@ -209,8 +212,8 @@ async def test_swagger_home_decorator(aiohttp_client, loop):
     assert 'Test Custom Title' in result['info']['title']
 
 
-async def test_swagger_def_decorator(aiohttp_client, loop):
-    app = web.Application(loop=loop)
+async def test_swagger_def_decorator(aiohttp_client):
+    app = web.Application()
     app.router.add_route('GET', "/ping", ping)
     description = "Test Custom Swagger"
     setup_swagger(app,
@@ -235,8 +238,8 @@ def swagger_info():
     return yaml.full_load(open(filename).read())
 
 
-async def test_swagger_info(aiohttp_client, loop, swagger_info):
-    app = web.Application(loop=loop)
+async def test_swagger_info(aiohttp_client, swagger_info):
+    app = web.Application()
     app.router.add_route('GET', "/ping", ping)
     description = "Test Custom Swagger"
     setup_swagger(app,
@@ -252,8 +255,8 @@ async def test_swagger_info(aiohttp_client, loop, swagger_info):
     assert 'API Title' in result['info']['title']
 
 
-async def test_undocumented_fn(aiohttp_client, loop):
-    app = web.Application(loop=loop)
+async def test_undocumented_fn(aiohttp_client):
+    app = web.Application()
     app.router.add_route('GET', "/undoc_ping", undoc_ping)
     setup_swagger(app)
     client = await aiohttp_client(app)
@@ -265,8 +268,8 @@ async def test_undocumented_fn(aiohttp_client, loop):
     assert not result['paths']
 
 
-async def test_wrong_method(aiohttp_client, loop):
-    app = web.Application(loop=loop)
+async def test_wrong_method(aiohttp_client):
+    app = web.Application()
     app.router.add_route('POST', "/post_ping", ping)
     setup_swagger(app)
     client = await aiohttp_client(app)
@@ -279,8 +282,8 @@ async def test_wrong_method(aiohttp_client, loop):
     resp = await client.get('/post_ping')
     assert resp.status == 405
 
-async def test_class_view_single_method(aiohttp_client, loop):
-    app = web.Application(loop=loop)
+async def test_class_view_single_method(aiohttp_client):
+    app = web.Application()
     app.router.add_route('GET', "/class_view", ClassView)
     setup_swagger(app)
 
@@ -303,8 +306,8 @@ async def test_class_view_single_method(aiohttp_client, loop):
     assert "post" not in result['paths']["/class_view"]
 
 
-async def test_class_view_multiple_methods(aiohttp_client, loop):
-    app = web.Application(loop=loop)
+async def test_class_view_multiple_methods(aiohttp_client):
+    app = web.Application()
     app.router.add_route('*', "/class_view", ClassView)
     setup_swagger(app)
 
@@ -341,10 +344,10 @@ async def test_class_view_multiple_methods(aiohttp_client, loop):
     assert "patch" not in result['paths']["/class_view"]
 
 
-async def test_data_defs(aiohttp_client, loop):
+async def test_data_defs(aiohttp_client):
     TESTS_PATH = abspath(join(dirname(__file__)))
     file = open(TESTS_PATH + "/data/example_data_definitions.json")
-    app = web.Application(loop=loop)
+    app = web.Application()
     app.router.add_route('GET', "/users", users_with_data_def)
     setup_swagger(app, definitions=json.loads(file.read()))
     file.close()
@@ -359,11 +362,11 @@ async def test_data_defs(aiohttp_client, loop):
     assert result['definitions']['Permission']['properties']['permission_param_3']['default'] is not None
 
 
-async def test_sub_app(aiohttp_client, loop):
-    sub_app = web.Application(loop=loop)
+async def test_sub_app(aiohttp_client):
+    sub_app = web.Application()
     sub_app.router.add_route('*', "/class_view", ClassView)
     setup_swagger(sub_app, api_base_url='/sub_app')
-    app = web.Application(loop=loop)
+    app = web.Application()
     app.add_subapp(prefix='/sub_app', subapp=sub_app)
 
     client = await aiohttp_client(app)

@@ -3,13 +3,15 @@ from os.path import abspath, dirname, join
 from inspect import isclass
 
 import yaml
+
+import aiohttp.hdrs
 from aiohttp import web
 from aiohttp.hdrs import METH_ANY, METH_ALL
 from jinja2 import Environment, BaseLoader
 
 try:
     import ujson as json
-except ImportError: # pragma: no cover
+except ImportError:  # pragma: no cover
     import json
 
 
@@ -26,14 +28,13 @@ def _extract_swagger_docs(end_point_doc, method="get"):
 
     # Build JSON YAML Obj
     try:
-        end_point_swagger_doc = (
-            yaml.full_load("\n".join(end_point_doc[end_point_swagger_start:]))
+        end_point_swagger_doc = yaml.full_load(
+            "\n".join(end_point_doc[end_point_swagger_start:])
         )
     except yaml.YAMLError:
         end_point_swagger_doc = {
-            "description": "⚠ Swagger document could not be loaded "
-                           "from docstring ⚠",
-            "tags": ["Invalid Swagger"]
+            "description": "⚠ Swagger document could not be loaded " "from docstring ⚠",
+            "tags": ["Invalid Swagger"],
         }
     return {method: end_point_swagger_doc}
 
@@ -53,60 +54,61 @@ def _build_doc_from_func_doc(route):
             end_point_doc = route.handler.__doc__.splitlines()
         except AttributeError:
             return {}
-        out.update(_extract_swagger_docs(end_point_doc, method=str(route.method).lower()))
+        out.update(
+            _extract_swagger_docs(end_point_doc, method=str(route.method).lower())
+        )
     return out
+
 
 def _get_method_names_for_handler(route):
     # Return all valid method names in handler if the method is *,
     # otherwise return the specific method.
     if route.method == METH_ANY:
-        return {
-            attr for attr in dir(route.handler)
-            if attr.upper() in METH_ALL
-        }
+        return {attr for attr in dir(route.handler) if attr.upper() in METH_ALL}
     else:
         return {
-            attr for attr in dir(route.handler)
+            attr
+            for attr in dir(route.handler)
             if attr.upper() in METH_ALL and attr.upper() == route.method
         }
 
 
 def generate_doc_from_each_end_point(
-        app: web.Application,
-        *,
-        ui_version: int = None,
-        api_base_url: str = "/",
-        description: str = "Swagger API definition",
-        api_version: str = "1.0.0",
-        title: str = "Swagger API",
-        contact: str = "",
-        template_path: str = None,
-        definitions: dict = None,
-        security_definitions: dict = None,
-        parameters: dict = None,
+    app: web.Application,
+    *,
+    ui_version: int = None,
+    api_base_url: str = "/",
+    description: str = "Swagger API definition",
+    api_version: str = "1.0.0",
+    title: str = "Swagger API",
+    contact: str = "",
+    template_path: str = None,
+    definitions: dict = None,
+    security_definitions: dict = None,
+    parameters: dict = None,
 ):
     # Clean description
     _start_desc = 0
     for i, word in enumerate(description):
-        if word != '\n':
+        if word != "\n":
             _start_desc = i
             break
     cleaned_description = "    ".join(description[_start_desc:].splitlines())
 
     def nesteddict2yaml(d, indent=10, result=""):
         for key, value in d.items():
-            result += " " * indent + str(key) + ':'
+            result += " " * indent + str(key) + ":"
             if isinstance(value, dict) and value:
                 result = nesteddict2yaml(value, indent + 2, result + "\n")
             elif isinstance(value, str):
-                result += " \"" + str(value) + "\"\n"
+                result += ' "' + str(value) + '"\n'
             else:
                 result += " " + str(value) + "\n"
         return result
 
     # Load base Swagger template
     jinja2_env = Environment(loader=BaseLoader())
-    jinja2_env.filters['nesteddict2yaml'] = nesteddict2yaml
+    jinja2_env.filters["nesteddict2yaml"] = nesteddict2yaml
 
     if template_path is None:
         if ui_version == 3:
@@ -115,17 +117,15 @@ def generate_doc_from_each_end_point(
             template_path = join(SWAGGER_TEMPLATE, "swagger.yaml")
 
     with open(template_path, "r") as f:
-        swagger_base = (
-            jinja2_env.from_string(f.read()).render(
-                description=cleaned_description,
-                version=api_version,
-                title=title,
-                contact=contact,
-                base_path=api_base_url,
-                definitions=definitions,
-                security_definitions=security_definitions,
-                parameters=parameters,
-            )
+        swagger_base = jinja2_env.from_string(f.read()).render(
+            description=cleaned_description,
+            version=api_version,
+            title=title,
+            contact=contact,
+            base_path=api_base_url,
+            definitions=definitions,
+            security_definitions=security_definitions,
+            parameters=parameters,
         )
 
     # The Swagger OBJ
@@ -133,32 +133,27 @@ def generate_doc_from_each_end_point(
     swagger["paths"] = defaultdict(dict)
 
     for route in app.router.routes():
-
         end_point_doc = None
 
         # If route has a external link to doc, we use it, not function doc
         if getattr(route.handler, "swagger_file", False):
             try:
                 with open(route.handler.swagger_file, "r") as f:
-                    end_point_doc = {
-                        route.method.lower():
-                            yaml.full_load(f.read())
-                    }
+                    end_point_doc = {route.method.lower(): yaml.full_load(f.read())}
             except yaml.YAMLError:
                 end_point_doc = {
                     route.method.lower(): {
                         "description": "⚠ Swagger document could not be "
-                                       "loaded from file ⚠",
-                        "tags": ["Invalid Swagger"]
+                        "loaded from file ⚠",
+                        "tags": ["Invalid Swagger"],
                     }
                 }
             except FileNotFoundError:
                 end_point_doc = {
                     route.method.lower(): {
-                        "description":
-                            "⚠ Swagger file not "
-                            "found ({}) ⚠".format(route.handler.swagger_file),
-                        "tags": ["Invalid Swagger"]
+                        "description": "⚠ Swagger file not "
+                        "found ({}) ⚠".format(route.handler.swagger_file),
+                        "tags": ["Invalid Swagger"],
                     }
                 }
 
